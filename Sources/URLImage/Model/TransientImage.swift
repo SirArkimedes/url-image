@@ -18,6 +18,8 @@ import ImageDecoder
 public protocol TransientImageType {
 
     var image: Image { get }
+
+  var size: CGSize { get }
 }
 
 
@@ -87,4 +89,8 @@ public extension TransientImageType where Self == TransientImage {
             return Image(decorative: self.cgImage, scale: 1.0)
         }
     }
+
+  var size: CGSize {
+    CGSize(width: self.cgImage.width, height: self.cgImage.height)
+  }
 }

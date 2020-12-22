@@ -36,15 +36,15 @@ public struct URLImage<Empty, InProgress, Failure, Content> : View where Empty :
 
     let failure: (_ error: Error, _ retry: @escaping () -> Void) -> Failure
 
-    let content: (_ image: Image) -> Content
+    let content: (_ image: Image, _ size: CGSize) -> Content
 
     public init(url: URL,
                 options: URLImageOptions = URLImageService.shared.defaultOptions,
                 empty: @escaping () -> Empty,
                 inProgress: @escaping (_ progress: Float?) -> InProgress,
                 failure: @escaping (_ error: Error, _ retry: @escaping () -> Void) -> Failure,
-                content: @escaping (_ image: Image) -> Content)
-    {
+                content: @escaping (_ image: Image, _ size: CGSize) -> Content
+    ) {
         assert(options.loadOptions.contains(.loadImmediately) || options.loadOptions.contains(.loadOnAppear),
                "Options must specify how to load the image")
 
@@ -67,7 +67,7 @@ public struct URLImage<Empty, InProgress, Failure, Content> : View where Empty :
                           inProgress: inProgress,
                           failure: failure,
                           content: { transientImage in
-                            content(transientImage.image)
+                            content(transientImage.image, transientImage.size)
                           })
     }
 }
@@ -80,7 +80,7 @@ public extension URLImage where Empty == EmptyView {
          options: URLImageOptions = URLImageService.shared.defaultOptions,
          inProgress: @escaping (_ progress: Float?) -> InProgress,
          failure: @escaping (_ error: Error, _ retry: @escaping () -> Void) -> Failure,
-         content: @escaping (_ image: Image) -> Content)
+         content: @escaping (_ image: Image, _ size: CGSize) -> Content)
     {
         self.init(url: url,
                   options: options,
@@ -99,7 +99,7 @@ public extension URLImage where Empty == EmptyView,
     init(url: URL,
          options: URLImageOptions = URLImageService.shared.defaultOptions,
          failure: @escaping (_ error: Error, _ retry: @escaping () -> Void) -> Failure,
-         content: @escaping (_ image: Image) -> Content)
+         content: @escaping (_ image: Image, _ size: CGSize) -> Content)
     {
         self.init(url: url,
                   options: options,
@@ -118,7 +118,7 @@ public extension URLImage where Empty == EmptyView,
 
     init(url: URL,
          options: URLImageOptions = URLImageService.shared.defaultOptions,
-         content: @escaping (_ image: Image) -> Content)
+         content: @escaping (_ image: Image, _ size: CGSize) -> Content)
     {
         self.init(url: url,
                   options: options,
@@ -140,7 +140,7 @@ struct URLImage_Previews: PreviewProvider {
                     let string = "\(error)"
                     return Text(string)
                  },
-                 content: { image in
+                 content: { image, _ in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fit)
